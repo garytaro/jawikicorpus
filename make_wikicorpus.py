@@ -39,7 +39,9 @@ import logging
 import os.path
 import sys
 
-from gensim.corpora import Dictionary, HashDictionary, MmCorpus, WikiCorpus
+# from gensim.corpora import Dictionary, HashDictionary, MmCorpus, WikiCorpus
+from jawikicorpus import *
+from gensim.corpora import Dictionary, HashDictionary, MmCorpus
 from gensim.models import TfidfModel
 
 

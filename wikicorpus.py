@@ -17,7 +17,6 @@ See scripts/process_wiki.py for a canned (example) script based on this
 module.
 """
 
-
 import bz2
 import logging
 import re
@@ -29,6 +28,11 @@ from gensim import utils
 # cannot import whole gensim.corpora, because that imports wikicorpus...
 from gensim.corpora.dictionary import Dictionary
 from gensim.corpora.textcorpus import TextCorpus
+
+import unicodedata
+import MeCab
+model = MeCab.Model_create("-Ochasen -d mecab-ipadic-neologd")
+tagger = model.createTagger()
 
 logger = logging.getLogger('gensim.corpora.wikicorpus')
 
@@ -157,6 +161,32 @@ def remove_file(s):
     return s
 
 
+def jatokenize(content):
+    ret_list = []
+    lines = tagger.parse(content).split('\n')
+    for line in lines:
+        if line == "EOS":
+            break
+        line = line.split('\t')
+        word = line[2]
+
+        # 漢字でない一文字のwordは無視
+        # 'ー'や'*'も同様
+        if len(word) == 1 and unicodedata.name(word[0])[0:4] != 'CJK ':
+            continue
+        # 二文字のひらがなは無視
+        if (len(word) == 2 and unicodedata.name(word[0])[0:4] == 'HIRA'
+                and unicodedata.name(word[1])[0:4] == 'HIRA'):
+            continue
+        if unicodedata.name(word[0])[0:4] == 'LATI':
+            continue
+        if (line[3][:2] == '名詞' or line[3][:2] == '動詞'
+                or line[3][:2] == '副詞' or line[3][:3] == '形容詞'):
+            print(word)
+            ret_list.append(word.encode('utf8'))
+    return ret_list
+
+
 def tokenize(content):
     """
     Tokenize a piece of text from wikipedia. The input string `content` is assumed
@@ -234,7 +264,7 @@ def process_article(args):
     if lemmatize:
         result = utils.lemmatize(text)
     else:
-        result = tokenize(text)
+        result = jatokenize(text)
     return result, title, pageid
 
 
