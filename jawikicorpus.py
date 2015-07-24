@@ -33,6 +33,7 @@ import unicodedata
 import MeCab
 model = MeCab.Model_create("-Ochasen -d mecab-ipadic-neologd")
 tagger = model.createTagger()
+ofs = open("out4dvec.cor", "w")
 
 logger = logging.getLogger('gensim.corpora.wikicorpus')
 
@@ -182,7 +183,9 @@ def jatokenize(content):
             continue
         if (line[3][:2] == '名詞' or line[3][:2] == '動詞'
                 or line[3][:2] == '副詞' or line[3][:3] == '形容詞'):
+            ofs.write("%s " % word)
             ret_list.append(word.encode('utf8'))
+    ofs.write("\n")
     return ret_list
 
 
