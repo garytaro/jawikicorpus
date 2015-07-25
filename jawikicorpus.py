@@ -171,15 +171,21 @@ def jatokenize(content):
         line = line.split('\t')
         word = line[2]
 
+        try:
+            jtype = unicodedata.name(word[0])
+        except:
+            continue
         # 漢字でない一文字のwordは無視
         # 'ー'や'*'も同様
-        if len(word) == 1 and unicodedata.name(word[0])[0:4] != 'CJK ':
+        if len(word) == 1 and jtype[0:4] != 'CJK ':
             continue
         # 二文字のひらがなは無視
-        if (len(word) == 2 and unicodedata.name(word[0])[0:4] == 'HIRA'
+        if (len(word) == 2 and jtype[0:4] == 'HIRA'
                 and unicodedata.name(word[1])[0:4] == 'HIRA'):
             continue
-        if unicodedata.name(word[0])[0:4] == 'LATI':
+        if jtype[0:4] == 'LATI':
+            continue
+        if word.isdigit():
             continue
         if (line[3][:2] == '名詞' or line[3][:2] == '動詞'
                 or line[3][:2] == '副詞' or line[3][:3] == '形容詞'):
