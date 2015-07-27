@@ -33,7 +33,7 @@ import unicodedata
 import MeCab
 model = MeCab.Model_create("-Ochasen -d mecab-ipadic-neologd")
 tagger = model.createTagger()
-ofs = open("out4dvec.cor", "w")
+ofs = open("out4dvec.cor", "w", encoding="utf8")
 
 logger = logging.getLogger('gensim.corpora.wikicorpus')
 
